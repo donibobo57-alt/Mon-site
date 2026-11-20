@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bots Discord sur mesure</title>
+<style>
+:root{--r:#d80f1f}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#f6eaea;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;background:linear-gradient(165deg,#000 0%,#2a0309 40%,#7a0010 75%,var(--r) 100%) fixed}
+.w{max-width:780px;margin:0 auto;padding:14px 14px 60px}
+.ban{display:block;width:100%;height:clamp(150px,34vw,250px);object-fit:cover;border-radius:16px;border:1px solid #8f1220;box-shadow:0 0 36px rgba(216,15,31,.35)}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:.4em 0}
+h1{text-align:center;font-size:clamp(26px,7vw,38px);text-shadow:0 0 16px var(--r)}
+nav{display:flex;gap:8px;margin:14px 0}
+nav .b{flex:1;background:#2b2022}
+nav .b.on{background:linear-gradient(90deg,#9c0014,var(--r))}
+.c{background:rgba(8,3,4,.75);border:1px solid #8f1220;border-radius:14px;padding:16px;margin:12px 0}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.g .c{margin:0;display:flex;flex-direction:column;justify-content:space-between}
+.b{display:block;width:100%;border:0;border-radius:10px;padding:12px 14px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(90deg,#9c0014,var(--r))}
+.b:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.b.gris{background:#2b2022}
+label{display:block;font-weight:600;margin-top:12px}
+input,textarea,select{width:100%;margin:5px 0;padding:12px;font-size:16px;color:#fff;background:#140a0c;border:1px solid #6b1019;border-radius:8px;font-family:inherit}
+input[type=color]{height:48px;padding:4px}
+.aide{color:#c9a9ad;font-size:14px}
+#log{height:320px;overflow:auto;background:#0c0507;border:1px solid #6b1019;border-radius:10px;padding:10px;margin:8px 0}
+.m{max-width:80%;padding:8px 12px;border-radius:12px;margin:6px 0;white-space:pre-wrap;word-break:break-word}
+.m.client{margin-left:auto;background:var(--r)}
+.m.admin{background:#2b2022}
+.m.sys{max-width:100%;text-align:center;color:#c9a9ad;font-size:14px}
+.row{display:flex;gap:8px}
+.row .b{width:auto}
+.it{padding:10px 0;border-bottom:1px solid #3a1218}
+#pv{width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid var(--r)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="w">
+<img class="ban" src="banner.gif" alt="Champ de lycoris rouges sous une pluie de pétales">
+
+<nav>
+ <button class="b on" data-t="home" onclick="tab('home')">Accueil</button>
+ <button class="b" data-t="chat" onclick="tab('chat')">Conversation</button>
+ <button class="b" data-t="hist" onclick="tab('hist')">Historique</button>
+</nav>
+
+<!-- INTERFACE 1 : ACCUEIL -->
+<section class="v" id="home">
+ <h1>Ton bot Discord, fait pour toi</h1>
+ <div class="g">
+  <div class="c"><div><h2>Bot personnalisé</h2><p>Tu décris ton idée : titre, texte, utilisation, commandes et style. On le crée pour toi.</p></div><button class="b" onclick="openF('perso')">Envoyer une demande</button></div>
+  <div class="c"><div><h2>Bot déjà fait</h2><p>Un bot prêt à l’emploi (modération, musique, tickets…). Tu dis lequel tu veux.</p></div><button class="b" onclick="openF('pret')">Choisir un bot</button></div>
+ </div>
+ <div class="c"><h3>Paiement</h3><p>Google Play : à partir de <b>5 €</b><br>Nitro : à partir de <b>Nitro Boost</b></p></div>
+ <div class="c"><h3>Comment ça se passe</h3>
+  <ol><li>Tu envoies ta demande avec ta photo de profil Discord.</li><li>Un administrateur l’accepte : l’onglet Conversation s’ouvre.</li><li>Vous discutez ici. On te donne le lien du bot, tu donnes ton code Google Play ou ton lien Nitro.</li></ol>
+  <p class="aide">Pas de bot illégal (raid, vol de comptes, spam). Ne donne ton code qu’après avoir reçu le lien du bot.</p></div>
+</section>
+
+<!-- FORMULAIRE -->
+<section class="v" id="form" hidden><div class="c">
+ <h2 id="ft"></h2>
+ <form id="f" autocomplete="off">
+  <label for="dc">Ton pseudo Discord</label><input id="dc" required maxlength="60">
+  <label for="ti" id="lt">Titre du bot</label><input id="ti" required maxlength="100">
+  <label for="tx">Texte (description)</label><textarea id="tx" rows="4" required maxlength="1000"></textarea>
+  <label for="us">Utilisation du bot</label><textarea id="us" rows="3" required maxlength="1000"></textarea>
+  <div id="extra">
+   <label for="cm">Commandes souhaitées</label><textarea id="cm" rows="3" maxlength="1000"></textarea>
+   <label for="bh">Comment il sera (style, couleurs, personnalité)</label><textarea id="bh" rows="3" maxlength="1000"></textarea>
+  </div>
+  <label for="py">Type de paiement</label>
+  <select id="py"><option>Google Play (dès 5 €)</option><option>Nitro (dès Nitro Boost)</option></select>
+  <label for="av">Photo de ton profil Discord (obligatoire)</label>
+  <input type="file" id="av" accept="image/*" required>
+  <img id="pv" alt="Aperçu" hidden><br><br>
+  <button class="b" id="go" type="submit">Envoyer la demande</button>
+ </form><br>
+ <button class="b gris" onclick="tab('home')">Retour</button>
+</div></section>
+
+<!-- INTERFACE 2 : CONVERSATION AVEC L'ADMIN -->
+<section class="v" id="chat" hidden><div class="c">
+ <h2>Conversation</h2>
+ <select id="sel" onchange="drawChat()"></select>
+ <div id="log"></div>
+ <div class="row"><input id="mi" maxlength="500" placeholder="Ton message…"><button class="b" onclick="send()">Envoyer</button></div>
+ <p class="aide" id="cn"></p>
+</div></section>
+
+<!-- INTERFACE 3 : HISTORIQUE + PROFIL -->
+<section class="v" id="hist" hidden>
+ <div class="c"><h2>Historique</h2><div id="hl"></div></div>
+ <div class="c"><h2>Mon profil</h2>
+  <label for="pn">Pseudo</label><input id="pn" maxlength="40">
+  <label for="pc">Couleur du site</label><input id="pc" type="color" value="#d80f1f">
+  <br><button class="b" onclick="saveProfile()">Enregistrer</button>
+ </div>
+</section>
+</div>
+
+<script>
+/* ===== À MODIFIER : l'adresse de ton serveur (étape hébergeur), sans "/" à la fin ===== */
+const API = "COLLE_URL_DU_SERVEUR";
+/* ===================================================================================== */
+
+const $ = s => document.querySelector(s);
+const uid = localStorage.uid || (localStorage.uid = crypto.randomUUID());
+const ST = {attente:"En attente", accepte:"Acceptée", refuse:"Refusée"};
+let kind = "perso", photo = "", S = {reqs:[], profile:{}}, loaded = false;
+
+function tab(id){
+  document.querySelectorAll(".v").forEach(v => v.hidden = v.id !== id);
+  document.querySelectorAll("nav .b").forEach(b => b.classList.toggle("on", b.dataset.t === id));
+  scrollTo(0,0);
+  if(id === "chat" || id === "hist") refresh();
+}
+function openF(k){
+  kind = k;
+  $("#ft").textContent = k === "perso" ? "Bot personnalisé" : "Bot déjà fait";
+  $("#lt").textContent = k === "perso" ? "Titre du bot" : "Quel bot veux-tu ?";
+  $("#extra").hidden = k !== "perso";
+  if(!$("#dc").value && S.profile.pseudo) $("#dc").value = S.profile.pseudo;
+  tab("form");
+}
+async function post(p, b){
+  try{
+    const r = await fetch(API + p, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b)});
+    return await r.json();
+  }catch{ return {error:"Serveur injoignable, réessaie."}; }
+}
+async function refresh(){
+  try{ S = await (await fetch(API + "/api/state?uid=" + uid)).json(); render(); }catch{}
+}
+function setColor(c){ if(c) document.documentElement.style.setProperty("--r", c); }
+
+$("#av").onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const im = new Image();
+  im.onload = () => {
+    const c = document.createElement("canvas"); c.width = c.height = 256;
+    const s = Math.min(im.width, im.height);
+    c.getContext("2d").drawImage(im, (im.width-s)/2, (im.height-s)/2, s, s, 0, 0, 256, 256);
+    photo = c.toDataURL("image/jpeg", .7);
+    $("#pv").src = photo; $("#pv").hidden = false;
+  };
+  im.src = URL.createObjectURL(f);
+};
+
+$("#f").onsubmit = async e => {
+  e.preventDefault();
+  if(!photo) return alert("Ajoute ta photo de profil Discord.");
+  const v = i => $("#"+i).value.trim();
+  $("#go").disabled = true;
+  const r = await post("/api/request", {uid, kind, discord:v("dc"), title:v("ti"), descr:v("tx"), usage:v("us"), cmds:v("cm"), style:v("bh"), pay:v("py"), avatar:photo});
+  $("#go").disabled = false;
+  if(r.error) return alert(r.error);
+  $("#f").reset(); photo = ""; $("#pv").hidden = true;
+  alert("Demande envoyée ! Suis-la dans l’historique.");
+  tab("hist");
+};
+
+function render(){
+  const p = S.profile || {};
+  if(!loaded){ loaded = true; $("#pn").value = p.pseudo || ""; $("#pc").value = p.color || "#d80f1f"; setColor(p.color); }
+  const h = $("#hl"); h.replaceChildren();
+  if(!S.reqs.length) h.textContent = "Aucune demande pour l’instant.";
+  [...S.reqs].reverse().forEach(r => {
+    const d = document.createElement("div"); d.className = "it";
+    d.textContent = (r.kind === "perso" ? "Personnalisé : " : "Prêt : ") + r.title + " (" + ST[r.status] + ", " + new Date(r.t).toLocaleDateString("fr-FR") + ")";
+    h.append(d);
+  });
+  drawChat();
+}
+function drawChat(){
+  const acc = S.reqs.filter(r => r.status === "accepte"), sel = $("#sel"), ids = acc.map(r => r.id).join();
+  if(sel.dataset.ids !== ids){
+    const cur = sel.value;
+    sel.replaceChildren(...acc.map(r => new Option(r.title, r.id)));
+    if(acc.some(r => r.id === cur)) sel.value = cur;
+    sel.dataset.ids = ids;
+  }
+  $("#cn").textContent = acc.length ? "" : "Aucune conversation. Elle s’ouvre quand un admin accepte ta demande.";
+  const r = acc.find(x => x.id === sel.value), log = $("#log"); log.replaceChildren();
+  (r ? r.msgs : []).forEach(m => { const d = document.createElement("div"); d.className = "m " + m.from; d.textContent = m.text; log.append(d); });
+  log.scrollTop = log.scrollHeight;
+}
+async function send(){
+  const t = $("#mi").value.trim(), id = $("#sel").value;
+  if(!t || !id) return;
+  $("#mi").value = "";
+  const r = await post("/api/msg", {uid, id, text:t});
+  if(r.error) alert(r.error);
+  refresh();
+}
+$("#mi").addEventListener("keydown", e => { if(e.key === "Enter") send(); });
+async function saveProfile(){
+  const c = $("#pc").value; setColor(c);
+  const r = await post("/api/profile", {uid, pseudo:$("#pn").value, color:c});
+  alert(r.error || "Profil enregistré.");
+}
+setInterval(() => { if(!$("#chat").hidden || !$("#hist").hidden) refresh(); }, 4000);
+refresh();
+</script>
+</body>
+</html>
